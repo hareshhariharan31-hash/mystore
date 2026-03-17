@@ -1,0 +1,63 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "Laptop",
+      "price": 50000,
+      "image": "https://via.placeholder.com/200"
+    },
+    {
+      "id": "2",
+      "name": "Smartphone",
+      "price": 25000,
+      "image": "https://via.placeholder.com/200"
+    },
+    {
+      "id": "3",
+      "name": "Headphones",
+      "price": 3000,
+      "image": "https://via.placeholder.com/200"
+    }
+  ],
+  "cart": [
+    {
+      "id": "a9cd",
+      "product_id": "2",
+      "name": "Smartphone",
+      "price": 25000,
+      "quantity": 1
+    }
+  ],
+  "orders": [
+    {
+      "id": "e2b0",
+      "items": [
+        {
+          "id": "9e76",
+          "product_id": "2",
+          "quantity": 1
+        }
+      ],
+      "total": null,
+      "name": "haresh",
+      "address": ";isufvmaps",
+      "date": "2026-03-17T11:36:31.878Z"
+    },
+    {
+      "id": "4816",
+      "name": "haresh",
+      "address": ";alsiuf[",
+      "items": [
+        {
+          "id": "5d8d",
+          "product_id": "2",
+          "name": "Smartphone",
+          "price": 25000,
+          "quantity": 1
+        }
+      ],
+      "total": 25000
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
