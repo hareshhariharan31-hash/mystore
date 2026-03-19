@@ -1,115 +1,101 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
+const mysql = require("mysql2");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Ecommerce API is running");
-});
-
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
-});
-const mysql = require("mysql2");
-
+/* ✅ MySQL Connection */
 const db = mysql.createConnection({
-  host: "localhost",
+  host: "localhost",   // change later for Render DB
   user: "root",
   password: "Haresh@2004",
   database: "ecommerce"
 });
 
-db.connect((err) => {
+db.connect(err => {
   if (err) {
     console.log(err);
   } else {
     console.log("MySQL Connected");
   }
 });
-app.get("/products", (req, res) => {
+
+/* ✅ ROUTES */
+
+// test
+app.get("/api", (req, res) => {
+  res.send("API working");
+});
+
+// products
+app.get("/api/products", (req, res) => {
   db.query("SELECT * FROM products", (err, result) => {
-    if (err) {
-      res.send(err);
-    } else {
-      res.json(result);
-    }
+    if (err) return res.send(err);
+    res.json(result);
   });
 });
-app.post("/cart", (req, res) => {
 
-  const { product_id, quantity } = req.body;
-
+// single product
+app.get("/api/products/:id", (req, res) => {
   db.query(
-    "INSERT INTO cart (product_id, quantity) VALUES (?, ?)",
-    [product_id, quantity],
+    "SELECT * FROM products WHERE id=?",
+    [req.params.id],
     (err, result) => {
-      if (err) {
-        res.send(err);
-      } else {
-        res.send("Product added to cart");
-      }
+      if (err) return res.send(err);
+      res.json(result[0]);
     }
   );
-
 });
-app.get("/cart", (req, res) => {
 
+// cart
+app.get("/api/cart", (req, res) => {
   const query = `
     SELECT cart.id, products.name, products.price, cart.quantity
     FROM cart
     JOIN products ON cart.product_id = products.id
   `;
-
   db.query(query, (err, result) => {
-    if (err) {
-      res.send(err);
-    } else {
-      res.json(result);
+    if (err) return res.send(err);
+    res.json(result);
+  });
+});
+
+// add to cart
+app.post("/api/cart", (req, res) => {
+  const { product_id, quantity } = req.body;
+
+  db.query(
+    "INSERT INTO cart (product_id, quantity) VALUES (?, ?)",
+    [product_id, quantity],
+    (err) => {
+      if (err) return res.send(err);
+      res.send("Added to cart");
     }
-  });
-
-  app.delete("/cart/:id", (req, res) => {
-
-  const id = req.params.id;
-
-  db.query("DELETE FROM cart WHERE id = ?", [id], (err, result) => {
-
-    if(err){
-      res.send(err);
-    }else{
-      res.send("Item removed");
-    }
-
-  });
-
+  );
 });
 
-app.get("/products/:id",(req,res)=>{
-
-const id = req.params.id;
-
-db.query("SELECT * FROM products WHERE id=?",[id],(err,result)=>{
-
-if(err){
-res.send(err);
-}else{
-res.send(result[0]);
-}
-
-});
-
-});
-
-app.delete("/cart/:id", (req, res) => {
-  const id = req.params.id;
-
-  db.query("DELETE FROM cart WHERE id = ?", [id], (err, result) => {
-    if (err) throw err;
-    res.send("Item removed");
+// delete cart
+app.delete("/api/cart/:id", (req, res) => {
+  db.query("DELETE FROM cart WHERE id=?", [req.params.id], (err) => {
+    if (err) return res.send(err);
+    res.send("Deleted");
   });
 });
 
+/* ✅ SERVE REACT BUILD */
+app.use(express.static(path.join(__dirname, "build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+
+/* ✅ PORT FIX FOR RENDER */
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
