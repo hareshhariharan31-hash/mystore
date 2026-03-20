@@ -12,7 +12,7 @@ function ProductDetail({ fetchCartCount }){
 
   useEffect(()=>{
 
-    axios.get(`http://localhost:5000/products/${id}`)
+    axios.get(`https://mystore-mq2s.onrender.com/products/${id}`)
     .then(res=>{
       setProduct(res.data);
     });
@@ -22,7 +22,7 @@ function ProductDetail({ fetchCartCount }){
   // ✅ FIXED addToCart
   const addToCart = () => {
 
-    axios.get("http://localhost:5000/cart")
+    axios.get("https://mystore-mq2s.onrender.com/cart")
     .then(res => {
 
       const existing = res.data.find(
@@ -31,7 +31,7 @@ function ProductDetail({ fetchCartCount }){
 
       if(existing){
         // ✅ update quantity if already exists
-        axios.patch(`http://localhost:5000/cart/${existing.id}`, {
+        axios.patch(`https://mystore-mq2s.onrender.com/cart/${existing.id}`, {
           quantity: existing.quantity + 1
         }).then(()=>{
           alert("Quantity updated in cart");
@@ -39,7 +39,7 @@ function ProductDetail({ fetchCartCount }){
 
       } else {
         // ✅ add full product details
-        axios.post("http://localhost:5000/cart",{
+        axios.post("https://mystore-mq2s.onrender.com/cart",{
           product_id: product.id,
           name: product.name,
           price: product.price,

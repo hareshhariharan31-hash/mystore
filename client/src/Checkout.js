@@ -11,7 +11,7 @@ function Checkout(){
 
   const placeOrder = () => {
 
-    axios.get("http://localhost:5000/cart")
+    axios.get("https://mystore-mq2s.onrender.com/cart")
     .then(res => {
 
       const cart = res.data;
@@ -20,7 +20,7 @@ function Checkout(){
         return acc + (item.price || 0) * (item.quantity || 1);
       },0);
 
-      return axios.post("http://localhost:5000/orders", {
+      return axios.post("https://mystore-mq2s.onrender.com/orders", {
         name,
         address,
         items: cart,
@@ -33,13 +33,13 @@ function Checkout(){
       alert("Order Placed Successfully 🎉");
 
       // clear cart
-      return axios.get("http://localhost:5000/cart");
+      return axios.get("https://mystore-mq2s.onrender.com0/cart");
 
     })
     .then(res => {
 
       const deleteRequests = res.data.map(item =>
-        axios.delete(`http://localhost:5000/cart/${item.id}`)
+        axios.delete(`https://mystore-mq2s.onrender.com/cart/${item.id}`)
       );
 
       return Promise.all(deleteRequests);

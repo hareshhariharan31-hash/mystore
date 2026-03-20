@@ -11,7 +11,7 @@ function Cart({ fetchCartCount }){
 
   const loadCart = () => {
 
-    axios.get("http://localhost:5000/cart")
+    axios.get("https://mystore-mq2s.onrender.com/cart")
     .then(res => {
 
       setCart(res.data);
@@ -35,7 +35,7 @@ function Cart({ fetchCartCount }){
 
   const removeItem = (id)=>{
 
-    axios.delete(`http://localhost:5000/cart/${id}`)
+    axios.delete(`https://mystore-mq2s.onrender.com/cart/${id}`)
     .then(()=>{
       loadCart();
       fetchCartCount(); // ✅ update navbar

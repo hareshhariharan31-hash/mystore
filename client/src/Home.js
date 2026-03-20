@@ -8,7 +8,7 @@ const [products,setProducts] = useState([]);
 
 useEffect(()=>{
 
-axios.get("http://localhost:5000/products")
+axios.get("https://mystore-mq2s.onrender.com")
 .then(res=>{
 setProducts(res.data);
 });
