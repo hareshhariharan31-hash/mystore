@@ -1,76 +1,92 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const mysql = require("mysql2");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// DB connection
-const db = mysql.createConnection({
-  host: "localhost",   // ⚠️ WILL NOT WORK ON RENDER (we fix later)
-  user: "root",
-  password: "Haresh@2004",
-  database: "ecommerce"
+/* =========================
+   ✅ SAMPLE DATA (TEMP)
+   ========================= */
+
+let products = [
+  { id: 1, name: "Laptop", price: 50000 },
+  { id: 2, name: "Smartphone", price: 25000 },
+  { id: 3, name: "Headphones", price: 3000 }
+];
+
+let cart = [];
+
+/* =========================
+   ✅ API ROUTES
+   ========================= */
+
+// test
+app.get("/api", (req, res) => {
+  res.send("API working");
 });
 
-db.connect(err => {
-  if (err) console.log(err);
-  else console.log("MySQL Connected");
-});
-
-// Routes
-app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
-
+// get products
 app.get("/products", (req, res) => {
-  db.query("SELECT * FROM products", (err, result) => {
-    if (err) res.send(err);
-    else res.json(result);
-  });
+  res.json(products);
 });
 
+// get single product
 app.get("/products/:id", (req, res) => {
-  db.query("SELECT * FROM products WHERE id=?", [req.params.id], (err, result) => {
-    if (err) res.send(err);
-    else res.json(result[0]);
-  });
+  const product = products.find(p => p.id == req.params.id);
+  res.json(product);
 });
 
+// get cart
 app.get("/cart", (req, res) => {
-  const query = `
-    SELECT cart.id, products.name, products.price, cart.quantity
-    FROM cart
-    JOIN products ON cart.product_id = products.id
-  `;
-  db.query(query, (err, result) => {
-    if (err) res.send(err);
-    else res.json(result);
-  });
+  res.json(cart);
 });
 
+// add to cart
 app.post("/cart", (req, res) => {
   const { product_id, quantity } = req.body;
 
-  db.query(
-    "INSERT INTO cart (product_id, quantity) VALUES (?, ?)",
-    [product_id, quantity],
-    (err) => {
-      if (err) res.send(err);
-      else res.send("Added");
-    }
-  );
+  const product = products.find(p => p.id == product_id);
+
+  if (!product) {
+    return res.status(404).send("Product not found");
+  }
+
+  const item = {
+    id: Date.now(),
+    product_id,
+    name: product.name,
+    price: product.price,
+    quantity: quantity || 1
+  };
+
+  cart.push(item);
+
+  res.send("Added to cart");
 });
 
+// delete cart item
 app.delete("/cart/:id", (req, res) => {
-  db.query("DELETE FROM cart WHERE id=?", [req.params.id], (err) => {
-    if (err) res.send(err);
-    else res.send("Deleted");
-  });
+  cart = cart.filter(item => item.id != req.params.id);
+  res.send("Item removed");
 });
+
+/* =========================
+   ✅ SERVE REACT BUILD
+   ========================= */
+
+app.use(express.static(path.join(__dirname, "build")));
+
+// ✅ Express v5 safe fallback (IMPORTANT)
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+
+/* =========================
+   ✅ START SERVER
+   ========================= */
 
 const PORT = process.env.PORT || 10000;
 
