@@ -17,11 +17,14 @@ function App() {
   const [cartCount, setCartCount] = useState(0);
 
   const fetchCartCount = () => {
-    axios.get("http://localhost:5000/cart")
+  axios.get("/cart")   // ✅ NO localhost
     .then(res => {
-      setCartCount(res.data.length);
+      setCartCount(res.data.length || 0);
+    })
+    .catch(() => {
+      setCartCount(0);
     });
-  };
+};
 
   useEffect(() => {
     fetchCartCount();

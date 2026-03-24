@@ -2,50 +2,56 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-function Cart({ fetchCartCount }){
+function Cart({ fetchCartCount }) {
 
-  const [cart,setCart] = useState([]);
-  const [total,setTotal] = useState(0);
+  const [cart, setCart] = useState([]);
+  const [total, setTotal] = useState(0);
 
   const navigate = useNavigate();
 
   const loadCart = () => {
 
-    axios.get("https://mystore-mq2s.onrender.com/cart")
-    .then(res => {
+    axios.get("/cart") // ✅ FIXED
+      .then(res => {
 
-      setCart(res.data);
+        if (Array.isArray(res.data)) {
+          setCart(res.data);
 
-      const sum = res.data.reduce((acc,item)=>{
-        return acc + (item.price || 0) * (item.quantity || 1);
-      },0);
+          const sum = res.data.reduce((acc, item) => {
+            return acc + (item.price || 0) * (item.quantity || 1);
+          }, 0);
 
-      setTotal(sum);
+          setTotal(sum);
+        } else {
+          setCart([]);
+          setTotal(0);
+        }
 
-    })
-    .catch(err => {
-      console.log(err);
-    });
+      })
+      .catch(err => {
+        console.log(err);
+        setCart([]);
+      });
 
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     loadCart();
-  },[]);
+  }, []);
 
-  const removeItem = (id)=>{
+  const removeItem = (id) => {
 
-    axios.delete(`https://mystore-mq2s.onrender.com/cart/${id}`)
-    .then(()=>{
-      loadCart();
-      fetchCartCount(); // ✅ update navbar
-    });
+    axios.delete(`/cart/${id}`) // ✅ FIXED
+      .then(() => {
+        loadCart();
+        fetchCartCount();
+      });
 
   };
 
-  return(
+  return (
 
-    <div style={{padding:"40px"}}>
+    <div style={{ padding: "40px" }}>
 
       <h1>Your Cart</h1>
 
@@ -56,24 +62,24 @@ function Cart({ fetchCartCount }){
           {cart.map(item => (
 
             <div key={item.id} style={{
-              border:"1px solid #ddd",
-              padding:"20px",
-              marginBottom:"10px",
-              borderRadius:"10px"
+              border: "1px solid #ddd",
+              padding: "20px",
+              marginBottom: "10px",
+              borderRadius: "10px"
             }}>
 
               <h3>{item.name || "No Name"}</h3>
               <p>Price: ₹{item.price || 0}</p>
               <p>Quantity: {item.quantity || 1}</p>
 
-              <button 
-                onClick={()=>removeItem(item.id)}
+              <button
+                onClick={() => removeItem(item.id)}
                 style={{
-                  background:"orange",
-                  color:"white",
-                  border:"none",
-                  padding:"8px 15px",
-                  borderRadius:"5px"
+                  background: "orange",
+                  color: "white",
+                  border: "none",
+                  padding: "8px 15px",
+                  borderRadius: "5px"
                 }}
               >
                 Remove
@@ -85,16 +91,16 @@ function Cart({ fetchCartCount }){
 
           <h2>Total: ₹{total}</h2>
 
-          <button 
+          <button
             style={{
-              marginTop:"20px",
-              padding:"10px 20px",
-              background:"green",
-              color:"white",
-              border:"none",
-              borderRadius:"5px"
+              marginTop: "20px",
+              padding: "10px 20px",
+              background: "green",
+              color: "white",
+              border: "none",
+              borderRadius: "5px"
             }}
-            onClick={()=>navigate("/checkout")}
+            onClick={() => navigate("/checkout")}
           >
             Buy Now
           </button>
