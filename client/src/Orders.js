@@ -10,7 +10,6 @@ axios.get("http://localhost:5000/orders")
 .then(res=>{
 setOrders(res.data);
 });
-},[]);
 
 return(
 
