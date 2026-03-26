@@ -18,6 +18,7 @@ let products = [
 ];
 
 let cart = [];
+let orders = []; // ✅ ADD THIS
 
 /* =========================
    ✅ API ROUTES
@@ -28,23 +29,21 @@ app.get("/api", (req, res) => {
   res.send("API working");
 });
 
-// get products
+// products
 app.get("/products", (req, res) => {
   res.json(products);
 });
 
-// get single product
 app.get("/products/:id", (req, res) => {
   const product = products.find(p => p.id == req.params.id);
   res.json(product);
 });
 
-// get cart
+// cart
 app.get("/cart", (req, res) => {
   res.json(cart);
 });
 
-// add to cart
 app.post("/cart", (req, res) => {
   const { product_id, quantity } = req.body;
 
@@ -67,10 +66,30 @@ app.post("/cart", (req, res) => {
   res.send("Added to cart");
 });
 
-// delete cart item
 app.delete("/cart/:id", (req, res) => {
   cart = cart.filter(item => item.id != req.params.id);
   res.send("Item removed");
+});
+
+/* =========================
+   ✅ ORDERS ROUTES (FIX)
+   ========================= */
+
+// ✅ GET ORDERS
+app.get("/orders", (req, res) => {
+  res.json(orders);
+});
+
+// ✅ CREATE ORDER
+app.post("/orders", (req, res) => {
+  const newOrder = {
+    id: Date.now(),
+    ...req.body
+  };
+
+  orders.push(newOrder);
+
+  res.send("Order placed");
 });
 
 /* =========================
@@ -79,7 +98,7 @@ app.delete("/cart/:id", (req, res) => {
 
 app.use(express.static(path.join(__dirname, "build")));
 
-// ✅ Express v5 safe fallback (IMPORTANT)
+// ⚠️ ALWAYS LAST
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
